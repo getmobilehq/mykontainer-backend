@@ -41,6 +41,7 @@ class Common(Configuration):
 
         #local apps
         'accounts',
+        'main',
         
         ### third party
         'rest_framework',
@@ -136,6 +137,7 @@ class Common(Configuration):
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
     DJOSER = {
+        "USER_ID_FIELD" : "id",
         'LOGIN_FIELD': 'email',
         'USER_CREATE_PASSWORD_RETYPE': True,
         'USERNAME_CHANGED_EMAIL_CONFIRMATION':False,
