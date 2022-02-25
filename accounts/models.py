@@ -6,6 +6,8 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import RegexValidator
 
+from main.models import BayArea, ShippingCompany
+
 from .managers import UserManager
 import uuid
 
@@ -26,10 +28,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name     = models.CharField(_('last name'),max_length = 250)
     role          = models.CharField(_('role'),max_length = 250, choices=ROLE_CHOICES)
     email         = models.EmailField(_('email'), unique=True)
-    business_name = models.CharField(_('business name'),max_length = 250, null=True)
     phone         = models.CharField(_('phone'), max_length = 20, unique = True, validators=[phone_regex])
     address       = models.CharField(_('address'), max_length = 250, null = True)
     password      = models.CharField(_('password'), max_length=300)
+    shipping_company = models.ForeignKey(
+        to=ShippingCompany,
+        on_delete=models.CASCADE, 
+        related_name="shipping_admins", 
+        null=True)
+    bay_area = models.ForeignKey(
+        to=BayArea,
+        on_delete=models.CASCADE, 
+        related_name="bay_admins", 
+        null=True)
     is_staff      = models.BooleanField(_('staff'), default=False)
     is_admin      = models.BooleanField(_('admin'), default= False)
     is_active     = models.BooleanField(_('active'), default=True)
@@ -40,10 +51,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 
                        'last_name', 
-                       'business_name',
                        'phone', 
                        'address',
                        'role',
+                       'shipping_company',
+                       'bay_area'
                        ]
 
     class Meta:

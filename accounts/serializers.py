@@ -11,4 +11,14 @@ class UserCreateSerializer(UserCreateSerializer):
         model = User
         fields = '__all__'
         
-from djoser.email import ActivationEmail
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=300, required=False)
+    class Meta():
+        model = User
+        fields = '__all__'
+        
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(max_length=300)
