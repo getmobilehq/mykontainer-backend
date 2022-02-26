@@ -14,6 +14,8 @@ from configurations import Configuration, values
 from dotenv import load_dotenv, find_dotenv
 from django.utils.timezone import timedelta
 import cloudinary
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 load_dotenv(find_dotenv())
 
@@ -222,7 +224,7 @@ class Staging(Common):
     The in-staging settings.
     """
     DEBUG = False
-    
+    ALLOWED_HOSTS = ['mykontainer.herokuapp.com']
     # Security
     SESSION_COOKIE_SECURE = values.BooleanValue(True)
     SECURE_BROWSER_XSS_FILTER = values.BooleanValue(True)
@@ -242,6 +244,20 @@ class Staging(Common):
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
     EMAIL_PORT = 25 
     EMAIL_USE_TLS = True    # use port 587
+    
+    sentry_sdk.init(
+    dsn="https://a0b58f4f4e70494ca1789423f462f75e@o1037728.ingest.sentry.io/6233739",
+    integrations=[DjangoIntegration()],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
 
 class Production(Staging):
     """
