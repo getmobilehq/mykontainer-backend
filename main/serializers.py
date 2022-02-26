@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import ShippingCompany, BayArea
-
+from rest_framework.exceptions import ValidationError
 
 class ShippingCompanySerializer(serializers.ModelSerializer):
     
@@ -16,3 +16,4 @@ class BayAreaSerializer(serializers.ModelSerializer):
     class Meta:
         model = BayArea
         fields = '__all__'
+

@@ -2,7 +2,10 @@ from django.db import models
 import uuid
 from django.forms import model_to_dict
 from django.utils.translation import ugettext_lazy as _
-# Create your models here.
+# from django.contrib.auth import get_user_model
+
+
+# User = get_user_model()
 
 class ShippingCompany(models.Model):
     id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
@@ -47,3 +50,5 @@ class BayArea(models.Model):
         self.is_active=False
         self.save()
         return 
+    
+    

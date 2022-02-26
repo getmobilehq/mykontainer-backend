@@ -18,7 +18,7 @@ E-mail: {instance.email}
 password: {instance.password}    
 
 Cheers,
-QuickSOS Team.       
+MyKontainer Team   
 """   
         # msg_html = render_to_string('signup_email.html', {
         #                 'first_name': str(instance.first_name).title(),

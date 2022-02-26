@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from accounts.permissions import IsBayAdmin, IsShippingAdminOrBayAdmin
 from .models import ShippingCompany, BayArea
 from .serializers import ShippingCompanySerializer, BayAreaSerializer
 from rest_framework import status
@@ -6,11 +6,14 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
 # Create your views here.
 
+SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
-@swagger_auto_schema(methods=["POST"], request_body=ShippingCompanySerializer())
+
+@swagger_auto_schema(methods=["POST"], request_body=ShippingCompanySerializer(many=True))
 @api_view(["GET", 'POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdminUser])
@@ -18,7 +21,7 @@ def shipping_company(request):
     
     if request.method=="GET":
         objs = ShippingCompany.objects.filter(is_active=True)
-        ShippingCompanySerializer(objs, many=True)
+        serializer= ShippingCompanySerializer(objs, many=True)
         
         data = {"message":"success",
                 "data" : serializer.data}
@@ -102,7 +105,7 @@ def shipping_company_detail(request, company_id):
         return Response({}, status = status.HTTP_204_NO_CONTENT)
 
 
-@swagger_auto_schema(methods=["POST"], request_body=BayAreaSerializer())
+@swagger_auto_schema(methods=["POST"], request_body=BayAreaSerializer(many=True))
 @api_view(["GET", 'POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdminUser])
@@ -110,7 +113,7 @@ def bay_area(request):
     
     if request.method=="GET":
         objs = BayArea.objects.filter(is_active=True)
-        BayAreaSerializer(objs, many=True)
+        serializer = BayAreaSerializer(objs, many=True)
         
         data = {"message":"success",
                 "data" : serializer.data}

@@ -13,6 +13,7 @@ from pathlib import Path
 from configurations import Configuration, values
 from dotenv import load_dotenv, find_dotenv
 from django.utils.timezone import timedelta
+import cloudinary
 
 load_dotenv(find_dotenv())
 
@@ -42,6 +43,7 @@ class Common(Configuration):
         #local apps
         'accounts',
         'main',
+        'bookings',
         
         ### third party
         'rest_framework',
@@ -134,7 +136,9 @@ class Common(Configuration):
 
     AUTH_USER_MODEL = 'accounts.User'
     
+    
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = "Chuka from MyKontainer <hello@getmobile.tech>"
 
     DJOSER = {
         "USER_ID_FIELD" : "id",
@@ -188,6 +192,13 @@ class Common(Configuration):
             }
             }
         }
+    
+    #CLOUDINARY FILE UPLOADS
+    cloudinary.config(
+        cloud_name = os.getenv('CLOUD_NAME'),
+        api_key = os.getenv('CLOUD_API_KEY'),
+        api_secret = os.getenv('CLOUD_API_SECRET')
+    )
 
 class Development(Common):
     """
@@ -225,6 +236,12 @@ class Staging(Common):
         ('HTTP_X_FORWARDED_PROTO', 'https')
     )
 
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmass.co'
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    EMAIL_PORT = 25 
+    EMAIL_USE_TLS = True    # use port 587
 
 class Production(Staging):
     """

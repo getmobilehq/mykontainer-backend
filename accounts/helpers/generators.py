@@ -10,3 +10,10 @@ def generate_password():
         a.append(random.choice(["@","!","$","#","="]))
     random.shuffle(a)
     return "".join(a)
+
+
+def generate_code(n):
+    
+    alphabet = string.ascii_letters + string.digits
+    code = ''.join(random.choice(alphabet) for i in range(n))
+    return code
