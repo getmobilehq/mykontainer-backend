@@ -17,6 +17,7 @@ import cloudinary
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
+
 load_dotenv(find_dotenv())
 
 class Common(Configuration):
