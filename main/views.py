@@ -1,4 +1,4 @@
-from accounts.permissions import IsBayAdmin, IsShippingAdminOrBayAdmin
+from accounts.permissions import IsAdminOrShippingAdmin, IsBayAdmin, IsShippingAdminOrBayAdmin
 from .models import ShippingCompany, BayArea
 from .serializers import ShippingCompanySerializer, BayAreaSerializer
 from rest_framework import status
@@ -108,11 +108,15 @@ def shipping_company_detail(request, company_id):
 @swagger_auto_schema(methods=["POST"], request_body=BayAreaSerializer(many=True))
 @api_view(["GET", 'POST'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAdminOrShippingAdmin])
 def bay_area(request):
     
     if request.method=="GET":
-        objs = BayArea.objects.filter(is_active=True)
+        if request.user.role == "admin":
+            objs = BayArea.objects.filter(is_active=True)
+        else:
+            objs = BayArea.objects.filter(is_active=True, shipping_company=request.user.shipping_company)
+            
         serializer = BayAreaSerializer(objs, many=True)
         
         data = {"message":"success",
@@ -141,7 +145,7 @@ def bay_area(request):
 @swagger_auto_schema(methods=['PUT', 'DELETE'], request_body=BayAreaSerializer())
 @api_view(['GET', 'PUT', 'DELETE'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAdminOrShippingAdmin])
 def bay_area_detail(request, bay_area_id):
     """"""
     
