@@ -10,10 +10,11 @@ User = get_user_model()
 def send_details(sender, instance, created, **kwargs):
     if created and instance.is_superuser!=True:
         # print(instance.password)
-        subject = f"YOUR {instance.role} ACCOUNT FOR MYKONTAINER".upper()
+        role = " ".join(str(instance.role).split('_'))
+        subject = f"YOUR {role} ACCOUNT FOR MYKONTAINER".upper()
         
         message = f"""Hi, {str(instance.first_name).title()}.
-You have just been onboarded on the quicksos platform. Your login details are below:
+You have just been onboarded on the MyKontainer platform. Your login details are below:
 E-mail: {instance.email} 
 password: {instance.password}    
 
