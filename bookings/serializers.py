@@ -17,9 +17,9 @@ class BookingCompleteSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6)
     
     
-    def verify(self):
+    def verify(self, request):
         try:
-            booking = Booking.objects.get(drop_off = self.validated_data['code'], is_active=True)
+            booking = Booking.objects.get(drop_off = self.validated_data['code'], is_active=True, bay_area=request.user.bay_area)
         except Booking.DoesNotExist:
             raise ValidationError({"message": "Invalid Code"})
         

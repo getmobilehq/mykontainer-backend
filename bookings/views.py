@@ -155,7 +155,7 @@ def booking_complete(request):
         serializer = BookingCompleteSerializer(data=request.data)
         
         if serializer.is_valid():
-            data = serializer.verify()
+            data = serializer.verify(request)
             
             return Response(data, status = status.HTTP_201_CREATED)
 
