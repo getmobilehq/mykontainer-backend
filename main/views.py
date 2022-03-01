@@ -1,4 +1,4 @@
-from accounts.permissions import IsAdminOrShippingAdmin, IsBayAdmin, IsShippingAdminOrBayAdmin
+from accounts.permissions import IsAdminOrShippingAdmin, IsAdminorReadOnly, IsBayAdmin, IsShippingAdminOrBayAdmin
 from .models import ShippingCompany, BayArea
 from .serializers import ShippingCompanySerializer, BayAreaSerializer
 from rest_framework import status
@@ -16,7 +16,7 @@ SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 @swagger_auto_schema(methods=["POST"], request_body=ShippingCompanySerializer(many=True))
 @api_view(["GET", 'POST'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAdminorReadOnly])
 def shipping_company(request):
     
     if request.method=="GET":
@@ -108,14 +108,16 @@ def shipping_company_detail(request, company_id):
 @swagger_auto_schema(methods=["POST"], request_body=BayAreaSerializer(many=True))
 @api_view(["GET", 'POST'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAdminOrShippingAdmin])
+@permission_classes([IsAdminorReadOnly])
 def bay_area(request):
     
     if request.method=="GET":
         if request.user.role == "admin":
             objs = BayArea.objects.filter(is_active=True)
-        else:
+        elif request.user.role == "shipping_admin":
             objs = BayArea.objects.filter(is_active=True, shipping_company=request.user.shipping_company)
+        else:
+            objs = BayArea.objects.filter(is_active=True)
             
         serializer = BayAreaSerializer(objs, many=True)
         

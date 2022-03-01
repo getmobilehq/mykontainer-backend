@@ -26,7 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
     first_name    = models.CharField(_('first name'),max_length = 250)
     last_name     = models.CharField(_('last name'),max_length = 250)
-    role          = models.CharField(_('role'),max_length = 250, choices=ROLE_CHOICES)
+    role          = models.CharField(_('role'), max_length = 250, choices=ROLE_CHOICES)
     email         = models.EmailField(_('email'), unique=True)
     phone         = models.CharField(_('phone'), max_length = 20, unique = True, validators=[phone_regex])
     address       = models.CharField(_('address'), max_length = 250, null = True)
