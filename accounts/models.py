@@ -29,6 +29,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     role          = models.CharField(_('role'), max_length = 250, choices=ROLE_CHOICES)
     email         = models.EmailField(_('email'), unique=True)
     phone         = models.CharField(_('phone'), max_length = 20, unique = True, validators=[phone_regex])
+    user_type = models.CharField(_("user type"), max_length=300, null=True, blank=True)
+    company_name = models.CharField(_("company name"), max_length=300, null=True, blank=True)
     address       = models.CharField(_('address'), max_length = 250, null = True)
     password      = models.CharField(_('password'), max_length=300)
     shipping_company = models.ForeignKey(
@@ -55,7 +57,9 @@ class User(AbstractBaseUser, PermissionsMixin):
                        'address',
                        'role',
                        'shipping_company',
-                       'bay_area'
+                       'bay_area',
+                       'company_name',
+                       'user_type'
                        ]
 
     class Meta:
