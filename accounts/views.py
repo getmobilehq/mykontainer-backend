@@ -40,6 +40,7 @@ def shipping_admin(request):
             
             serializer.validated_data['password'] = generate_password()
             serializer.validated_data['is_active'] = True
+            serializer.validated_data['is_admin'] = True
             serializer.save()
             
             data = {
@@ -82,6 +83,7 @@ def bay_admin(request):
             
             serializer.validated_data['password'] = generate_password()
             serializer.validated_data['is_active'] = True
+            serializer.validated_data['is_admin'] = True
             serializer.save()
             
             data = {

@@ -8,7 +8,7 @@ User = get_user_model()
 
 @receiver(post_save, sender=User)
 def send_details(sender, instance, created, **kwargs):
-    if created and instance.is_superuser!=True:
+    if created and instance.is_superuser!=True and instance.is_admin==True:
         # print(instance.password)
         role = " ".join(str(instance.role).split('_'))
         subject = f"YOUR {role} ACCOUNT FOR MYKONTAINER".upper()
