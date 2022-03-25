@@ -51,7 +51,6 @@ def shipping_company(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdminUser])
 def shipping_company_detail(request, company_id):
-    """"""
     
     try:
         obj = ShippingCompany.objects.get(id = company_id, is_active=True)

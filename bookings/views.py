@@ -3,7 +3,7 @@ from accounts.helpers.generators import generate_code
 
 from accounts.permissions import IsBayAdmin, IsShippingAdminOrBayAdmin
 from .models import Booking, ShippingCompany, BayArea
-from .serializers import BookingCompleteSerializer, BookingSerializer
+from .serializers import AddBookingSerializer, BookingCompleteSerializer, BookingSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -11,22 +11,24 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+from config.settings import Common
 
 # Create your views here.
 
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
+User = get_user_model()
     
-    
-    
-@swagger_auto_schema(methods=["POST"], request_body=BookingSerializer())
+@swagger_auto_schema(methods=["POST"], request_body=AddBookingSerializer())
 @api_view([ 'POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def booking(request):
     
     if request.method=='POST':
-        serializer = BookingSerializer(data=request.data)
+        serializer = AddBookingSerializer(data=request.data)
         
         if serializer.is_valid():
             bay = serializer.validated_data['bay_area']
@@ -34,18 +36,15 @@ def booking(request):
             
             if bay.available_space ==0:
                 raise ValidationError({"message":"Available spaces for this bay area has been used up."})
-            serializer.validated_data['drop_off'] = generate_code(6)
-            serializer.validated_data['user'] = request.user
             
-            serializer.save()
+                
+                
             
             
-            bay.available_space-=1
-            bay.save()
+            data = serializer.create(serializer.validated_data,request)
             
-            data = {"message":"success",
-                    "data" : serializer.data}
-            
+
+
             return Response(data, status=status.HTTP_201_CREATED)
         else:
             errors = {
@@ -167,3 +166,26 @@ def booking_complete(request):
             }
 
             return Response(data, status = status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def user_booking(request):       
+    if request.method=="GET":
+        objs = Booking.objects.filter(user=request.user)
+        
+        dates = objs.values_list('date').distinct()
+        print(dates)
+        data = {}
+        for date in dates:
+            date=date[0]
+            data_per_date = objs.filter(date=date)
+            serializer = BookingSerializer(data_per_date, many=True)
+            data[str(date)] = serializer.data
+            
+        
+        data = {"message":"success",
+                "data" : data}
+            
+        return Response(data, status=status.HTTP_200_OK)

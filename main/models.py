@@ -34,6 +34,7 @@ class BayArea(models.Model):
     address = models.CharField(max_length=500)
     shipping_company = models.ForeignKey(ShippingCompany, related_name="bay_areas", on_delete=models.CASCADE)
     available_space = models.IntegerField(default=0)
+    threshold = models.IntegerField(default=0)
     date_added = models.DateTimeField(auto_now_add=True)
     is_active= models.BooleanField(default=True)
     
