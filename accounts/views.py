@@ -1,4 +1,4 @@
-from .serializers import LoginSerializer, CustomUserSerializer
+from .serializers import LoginSerializer, CustomUserSerializer, NewOtpSerializer, OTPVerifySerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -169,3 +169,37 @@ def user_login(request):
                     }
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
             
+
+@swagger_auto_schema(methods=['POST'],  request_body=NewOtpSerializer())
+@api_view(['POST'])
+def reset_otp(request):
+    if request.method == 'POST':
+        serializer = NewOtpSerializer(data = request.data)
+        if serializer.is_valid():
+            data = serializer.get_new_otp()
+            
+            return Response(data, status=status.HTTP_200_OK)
+        
+        else:
+            return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+        
+        
+            
+@swagger_auto_schema(methods=['POST'], request_body=OTPVerifySerializer())
+@api_view(['POST'])
+def otp_verification(request):
+    
+    """Api view for verifying OTPs """
+
+    if request.method == 'POST':
+
+        serializer = OTPVerifySerializer(data = request.data)
+
+        if serializer.is_valid():
+            data = serializer.verify_otp(request)
+            
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+
+            return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+        

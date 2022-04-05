@@ -5,6 +5,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import RegexValidator
+from django.utils import timezone
 
 from main.models import BayArea, ShippingCompany
 
@@ -72,5 +73,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     def delete(self):
         self.is_active = False
         self.save()
+        
+        
+        
+class ActivationOtp(models.Model):
+    user  =models.ForeignKey('accounts.User', on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    expiry_date = models.DateTimeField()
+    
+    
+    def is_valid(self):
+        return bool(self.expiry_date > timezone.now())
 
 
