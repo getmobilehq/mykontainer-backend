@@ -98,9 +98,11 @@ class BookingCompleteSerializer(serializers.Serializer):
         if booking.status == "pending":
             booking.status = "completed"
             booking.save()
+            serializer = BookingSerializer(booking)
             
             
-            return {"message": "Booking Completed"}
+            return {"message": "Booking Completed", 
+                    'data':serializer.data}
         else:
             raise ValidationError({"message": "Code already used."})
         
