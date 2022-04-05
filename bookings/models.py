@@ -30,6 +30,9 @@ class Booking(models.Model):
     
     def __str__(self) -> str:
         return self.name
+
+    class Meta:
+        ordering = ['-date_created']
     
     @property
     def shipping_company_detail(self):
