@@ -41,10 +41,7 @@ def booking(request):
             
             if bay.available_space ==0:
                 raise ValidationError({"message":"Available spaces for this bay area has been used up."})
-            
-                
-                
-            
+
             
             data = serializer.create(serializer.validated_data,request)
             
