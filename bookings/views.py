@@ -1,6 +1,8 @@
+from datetime import datetime
+from django.http import HttpResponse
 from django.shortcuts import render
 from accounts.helpers.generators import generate_code
-
+from django.utils import timezone
 from accounts.permissions import IsBayAdmin, IsShippingAdminOrBayAdmin
 from .models import Booking, ShippingCompany, BayArea
 from .serializers import AddBookingSerializer, BookingCompleteSerializer, BookingSerializer
@@ -14,6 +16,9 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from config.settings import Common
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+
 
 # Create your views here.
 
@@ -189,3 +194,27 @@ def user_booking(request):
                 "data" : data}
             
         return Response(data, status=status.HTTP_200_OK)
+    
+
+@api_view(["GET"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsBayAdmin])
+def bookings_pdf(request):
+    # request.user = User.objects.first()
+    date=timezone.now().date()
+
+    objs = Booking.objects.filter(is_active=True, bay_area=request.user.bay_area, date=date)
+    template_path = 'bookings.html'
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Bookings-{date}.pdf"'
+
+    html = render_to_string(template_path, 
+                            {'bookings': objs,
+                             'date':date,
+                             "user":request.user
+                             })
+
+    pisa.CreatePDF(html, dest=response)
+
+    return response 
