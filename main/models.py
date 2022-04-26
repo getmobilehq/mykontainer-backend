@@ -2,14 +2,19 @@ from django.db import models
 import uuid
 from django.forms import model_to_dict
 from django.utils.translation import ugettext_lazy as _
-# from django.contrib.auth import get_user_model
+from django.core.validators import RegexValidator
 
 
 # User = get_user_model()
+phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+2341234567890'. Up to 15 digits allowed.")
 
 class ShippingCompany(models.Model):
-    id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
-    name = models.CharField(max_length=255, unique=True)
+    id    = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
+    name  = models.CharField(max_length=255, unique=True)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length = 20, validators=[phone_regex])
+    opening_hours = models.CharField(max_length=300)
+    address = models.CharField(max_length=300)
     date_added = models.DateTimeField(auto_now_add=True)
     is_active= models.BooleanField(default=True)
     
@@ -32,6 +37,8 @@ class BayArea(models.Model):
     id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=255, unique=True)
     address = models.CharField(max_length=500)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length = 20, validators=[phone_regex])
     shipping_company = models.ForeignKey(ShippingCompany, related_name="bay_areas", on_delete=models.CASCADE)
     available_space = models.IntegerField(default=0)
     threshold = models.IntegerField(default=0)
