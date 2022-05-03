@@ -15,6 +15,7 @@ class ShippingCompany(models.Model):
     phone = models.CharField(max_length = 20, validators=[phone_regex])
     opening_hours = models.CharField(max_length=300)
     address = models.CharField(max_length=300)
+    freedays = models.IntegerField(default=0)
     date_added = models.DateTimeField(auto_now_add=True)
     is_active= models.BooleanField(default=True)
     
@@ -30,8 +31,12 @@ class ShippingCompany(models.Model):
     def delete(self):
         self.is_active=False
         self.save()
+        self.bookings.update(is_active=False)
+        self.shipping_admins.update(is_active=False)
+        self.demurages.update(is_active=False)
+        for bay in self.bay_areas.all():
+            bay.delete()
         return 
-    
     
 class BayArea(models.Model):
     id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
@@ -57,6 +62,8 @@ class BayArea(models.Model):
     def delete(self):
         self.is_active=False
         self.save()
+        self.bookings.update(is_active=False)
+        self.bay_admins.update(is_active=False)
         return 
     
     

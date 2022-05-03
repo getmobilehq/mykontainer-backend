@@ -13,7 +13,8 @@ class Booking(models.Model):
         ("pending", "Pending"),
         ("completed", "Completed")
     )
-      
+    SIZES = [("20 feet", "20 feet"),
+               ("40 feet", "40 feet")]
     id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
     user = models.ForeignKey(User, related_name="bookings", on_delete=models.CASCADE, null=True)
     shipping_company = models.ForeignKey(ShippingCompany, related_name="bookings", on_delete=models.CASCADE)
@@ -21,7 +22,7 @@ class Booking(models.Model):
     date = models.DateField()
     laden_number = models.CharField(max_length=350)
     container_number = models.CharField(max_length=350)
-    container_size = models.CharField(max_length=350)
+    container_size = models.CharField(max_length=350, choices=SIZES)
     drop_off = models.CharField(max_length=6, null=True, blank=True)
     status = models.CharField(max_length=50, default="pending", choices=STATUS)
     is_active= models.BooleanField(default=True)

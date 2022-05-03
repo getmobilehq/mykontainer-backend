@@ -47,6 +47,7 @@ class Common(Configuration):
         'accounts',
         'main',
         'bookings',
+        'demurage',
         
         ### third party
         'rest_framework',
