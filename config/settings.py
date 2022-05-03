@@ -247,6 +247,17 @@ class Staging(Common):
     EMAIL_PORT = 25 
     EMAIL_USE_TLS = True    # use port 587
     
+    DATABASE ={
+        "default": {
+            "ENGINE": 'django.db.backends.mysql',
+            "NAME": "mykontainer$mykontainer",
+            "USER": "mykontainer",
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": ""
+            },
+        }
+
     sentry_sdk.init(
     dsn="https://a0b58f4f4e70494ca1789423f462f75e@o1037728.ingest.sentry.io/6233739",
     integrations=[DjangoIntegration()],
