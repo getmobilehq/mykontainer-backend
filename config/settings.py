@@ -226,7 +226,8 @@ class Staging(Common):
     The in-staging settings.
     """
     DEBUG = False
-    ALLOWED_HOSTS = ['mykontainer.herokuapp.com']
+    ALLOWED_HOSTS = ['mykontainer.herokuapp.com',
+                     'mykontainer.pythonanywhere.com']
     # Security
     SESSION_COOKIE_SECURE = values.BooleanValue(True)
     SECURE_BROWSER_XSS_FILTER = values.BooleanValue(True)
