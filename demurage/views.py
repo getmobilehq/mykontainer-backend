@@ -123,14 +123,20 @@ def calculate_demurage(request):
             
             if day_range > company.freedays:
                 days = day_range - company.freedays 
-                rate = Demurage.objects.get(shipping_company=company, 
-                                    size=serializer.validated_data['size'], 
-                                    start_day__gte=days, 
-                                    end_day__lte=days, 
-                                    is_active=True)
-                
-                data = {"message":"success",
-                        "amount_payable" : days*rate.price_per_day}
+                try:
+                    rate = Demurage.objects.get(shipping_company=company, 
+                                        size=serializer.validated_data['size'], 
+                                        start_day__lte=days, 
+                                        end_day__gte=days, 
+                                        is_active=True)
+                    
+                    data = {"message":"success",
+                            "amount_payable" : days*rate.price_per_day}
+                except Demurage.DoesNotExist:
+                    errors = {"message":"failed",
+                            "errors":"unable to fetch range. Not found"
+                            }
+                    return Response(errors, status=status.HTTP_404_NOT_FOUND)
             else:
                 data = {
                     "message":"success",
