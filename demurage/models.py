@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.forms import model_to_dict
 
 # Create your models here.
 class Demurage(models.Model):
@@ -19,3 +20,8 @@ class Demurage(models.Model):
     def delete(self):
         self.is_active=False
         self.save()
+        
+    
+    @property
+    def shipping_company_detail(self):
+        return model_to_dict(self.shipping_company, exclude=["date_added","is_active"])

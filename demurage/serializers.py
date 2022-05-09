@@ -4,10 +4,11 @@ from .models import Demurage
 from rest_framework.exceptions import ValidationError
 
 class DemurageSerializer(serializers.ModelSerializer):
-    
+    shipping_company_detail = serializers.ReadOnlyField()
     class Meta:
         model = Demurage
         fields = '__all__'
+        write_only_fields = ['shipping_company']
         
         
 class CalculatorSerializer(serializers.Serializer):
