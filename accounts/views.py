@@ -114,7 +114,7 @@ def user_login(request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
-            provider = 'email'
+            # provider = 'email'
             user = authenticate(request, email = data['email'], password = data['password'])
             if user is not None:
                 if user.is_active==True:

@@ -15,7 +15,7 @@ from rest_framework.exceptions import PermissionDenied
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
 
-@swagger_auto_schema(methods=["POST"], request_body=DemurageSerializer(many=True))
+@swagger_auto_schema(methods=["POST"], request_body=DemurageSerializer())
 @api_view(["GET", 'POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdminorReadOnly])
