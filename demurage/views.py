@@ -1,7 +1,7 @@
 from accounts.permissions import IsAdminOrShippingAdmin, IsAdminorReadOnly, IsBayAdmin, IsShippingAdminOrBayAdmin
 from main.models import ShippingCompany
-from .models import Demurage
-from .serializers import CalculatorSerializer, DemurageSerializer
+from .models import Demurage, DemurageSize
+from .serializers import CalculatorSerializer, DemurageSerializer, SizeSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.response import Response
@@ -150,3 +150,95 @@ def calculate_demurage(request):
                 "errors":serializer.errors}
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
         
+        
+        
+        
+@swagger_auto_schema(methods=["POST"], request_body=SizeSerializer())
+@api_view(["GET", 'POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAdminorReadOnly])
+def demurage_sizes(request):
+    
+    if request.method=="GET":
+        objs = DemurageSize.objects.filter(is_active=True)
+        serializer= SizeSerializer(objs, many=True)
+        
+        data = {"message":"success",
+                "data" : serializer.data}
+            
+        return Response(data, status=status.HTTP_200_OK)
+    
+    elif request.method=='POST':
+        serializer = SizeSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            
+            data = {"message":"success",
+                    "data" : serializer.data}
+            
+            return Response(data, status=status.HTTP_201_CREATED)
+        else:
+            errors = {
+                "message":"failed",
+                "errors":serializer.errors}
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+
+@swagger_auto_schema(methods=['PUT', 'DELETE'], request_body=SizeSerializer())
+@api_view(['GET', 'PUT', 'DELETE'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAdminUser])
+def demurage_size_detail(request, size_id):
+    
+    try:
+        obj = DemurageSize.objects.get(id = size_id, is_active=True)
+    
+    except DemurageSize.DoesNotExist:
+        data = {
+                'message' : "Does not exist"
+            }
+
+        return Response(data, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = SizeSerializer(obj)
+        
+        data = {
+                'status'  : True,
+                'message' : "Successful",
+                'data' : serializer.data,
+            }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+    elif request.method == 'PUT':
+        serializer = SizeSerializer(obj, data = request.data, partial=True) 
+
+        if serializer.is_valid():
+            
+            serializer.save()
+
+            data = {
+                'message' : "Successful",
+                'data' : serializer.data,
+            }
+
+            return Response(data, status = status.HTTP_202_ACCEPTED)
+
+        else:
+            data = {
+
+                'message' : "Unsuccessful",
+                'error' : serializer.errors,
+            }
+
+            return Response(data, status = status.HTTP_400_BAD_REQUEST)
+
+    #delete the account
+    elif request.method == 'DELETE':
+        obj.delete()
+
+
+        return Response({}, status = status.HTTP_204_NO_CONTENT)

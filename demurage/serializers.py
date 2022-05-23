@@ -1,14 +1,30 @@
 from rest_framework import serializers
 from main.models import ShippingCompany
-from .models import Demurage
+from .models import Demurage, DemurageSize
 from rest_framework.exceptions import ValidationError
 
+
+class SizeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DemurageSize
+        fields = '__all__'
+        
 class DemurageSerializer(serializers.ModelSerializer):
     shipping_company_detail = serializers.ReadOnlyField()
+    size_detail = serializers.ReadOnlyField()
     class Meta:
         model = Demurage
         fields = '__all__'
-        write_only_fields = ['shipping_company']
+        write_only_fields = ['shipping_company', 'size']
+        
+        
+    def validate_size(self, data):
+        if data is not None:
+            try:
+                data = DemurageSize.objects.get(id=data)
+            except DemurageSize.DoesNotExist:
+                raise ValidationError(["Enter a valid size ID"])
+        raise ValidationError(["This field cannot be null"])
         
         
 class CalculatorSerializer(serializers.Serializer):

@@ -3,16 +3,40 @@ from django.db import models
 from django.forms import model_to_dict
 
 # Create your models here.
+
+class DemurageSize(models.Model):
+    SIZES = (('Dry 20 ft', 'Dry 20 ft'),
+             ('Reefer 20 ft', 'Reefer 20 ft'),
+             ('Special 20 ft', 'Special 20 ft'),
+             ('Dry 40 ft', 'Dry 40 ft'),
+             ('Reefer 40 ft', 'Reefer 40 ft'),
+             ("Special 40 ft", "Special 40 ft"),
+             ("Dry 45 ft", "Dry 45 ft"),
+             ("Reefer 45 ft", "Reefer 45 ft"))
+		
+		
+
+    id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
+    size = models.CharField(max_length=255, unique=True, choices=SIZES)
+    free_days = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    
+    def delete(self):
+        self.is_active=False
+        self.ranges.update(is_active=False)
+        self.save()
+        
+        
+
 class Demurage(models.Model):
-    SIZES = [("20 feet", "20 feet"),
-               ("40 feet", "40 feet")]
     
     id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
     shipping_company = models.ForeignKey("main.ShippingCompany", on_delete=models.CASCADE, related_name="demurages")
     start_day = models.IntegerField()
     end_day = models.IntegerField()
     price_per_day = models.FloatField()
-    size = models.CharField(max_length=255, choices=SIZES)
+    size = models.ForeignKey("demurage.DemurageSize", on_delete=models.CASCADE, related_name="ranges", null=True)
     is_active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
     
@@ -25,3 +49,8 @@ class Demurage(models.Model):
     @property
     def shipping_company_detail(self):
         return model_to_dict(self.shipping_company, exclude=["date_added","is_active"])
+    
+    
+    @property
+    def size_detail(self):
+        return model_to_dict(self.size, exclude=["date_added","is_active"])
