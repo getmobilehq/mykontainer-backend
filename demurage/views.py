@@ -9,11 +9,12 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 # Create your views here.
 
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
+VAT = 0.075
 
 @swagger_auto_schema(methods=["POST"], request_body=DemurageSerializer())
 @api_view(["GET", 'POST'])
@@ -117,21 +118,37 @@ def calculate_demurage(request):
         serializer = CalculatorSerializer(data=request.data)
         
         if serializer.is_valid():
-            company = serializer.validated_data.get('shipping_company')
-            company:ShippingCompany
+            demurage_type = serializer.validated_data.get("demurage_type")
+            company = serializer.validated_data.get("shipping_company")
+            
+            size = serializer.validated_data.get('size')
+            size:DemurageSize
+            
             day_range = (serializer.validated_data.get("end_date") - serializer.validated_data.get("start_date")).days
             
-            if day_range > company.freedays:
-                days = day_range - company.freedays 
+            if day_range >= size.free_days:
+                days = day_range - size.free_days 
                 try:
                     rate = Demurage.objects.get(shipping_company=company, 
-                                        size=serializer.validated_data['size'], 
+                                        size=size, 
                                         start_day__lte=days, 
                                         end_day__gte=days, 
+                                        demurage_type=demurage_type,
                                         is_active=True)
+                    amount = days*rate.price_per_day
+                    vat_amount = amount*VAT
                     
                     data = {"message":"success",
-                            "amount_payable" : days*rate.price_per_day}
+                            "data":{
+                                "container_type":size.size,
+                                "start_date":serializer.validated_data.get("start_date"),
+                                "end_date":serializer.validated_data.get("end_date"),
+                                "chargeable_days":days,
+                                "amount" : amount,
+                                "vat_amount":vat_amount,
+                                "total":amount+vat_amount,
+                                "currency": "NGN"
+                                }}
                 except Demurage.DoesNotExist:
                     errors = {"message":"failed",
                             "errors":"unable to fetch range. Not found"
@@ -140,7 +157,16 @@ def calculate_demurage(request):
             else:
                 data = {
                     "message":"success",
-                    "amount": 0
+                    "data":{
+                                "container_type":size.size,
+                                "start_date":serializer.validated_data.get("start_date"),
+                                "end_date":serializer.validated_data.get("end_date"),
+                                "chargeable_days":0,
+                                "amount" : 0,
+                                "vat_amount":0,
+                                "total":0,
+                                "currency": "NGN"
+                    }
                 }
                 
             return Response(data, status=status.HTTP_201_CREATED)

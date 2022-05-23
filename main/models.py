@@ -15,7 +15,6 @@ class ShippingCompany(models.Model):
     phone = models.CharField(max_length = 20, validators=[phone_regex])
     opening_hours = models.CharField(max_length=300)
     address = models.CharField(max_length=300)
-    freedays = models.IntegerField(default=0)
     date_added = models.DateTimeField(auto_now_add=True)
     is_active= models.BooleanField(default=True)
     

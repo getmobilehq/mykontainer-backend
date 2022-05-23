@@ -27,6 +27,9 @@ class DemurageSize(models.Model):
         self.ranges.update(is_active=False)
         self.save()
         
+    def __str__(self):
+        return self.size
+        
         
 
 class Demurage(models.Model):
@@ -37,6 +40,8 @@ class Demurage(models.Model):
     end_day = models.IntegerField()
     price_per_day = models.FloatField()
     size = models.ForeignKey("demurage.DemurageSize", on_delete=models.CASCADE, related_name="ranges", null=True)
+    demurage_type = models.CharField(max_length=250, blank=True, null=True, choices=(("import", "Import"),
+            ("export","Export")))
     is_active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
     

@@ -19,19 +19,19 @@ class DemurageSerializer(serializers.ModelSerializer):
         
         
     def validate_size(self, data):
-        if data is not None:
-            try:
-                data = DemurageSize.objects.get(id=data)
-            except DemurageSize.DoesNotExist:
-                raise ValidationError(["Enter a valid size ID"])
-        raise ValidationError(["This field cannot be null"])
+        if data is None:
+            raise ValidationError(["This field cannot be null"])
         
-        
+        return data
+    
 class CalculatorSerializer(serializers.Serializer):
     start_date = serializers.DateField()
     end_date = serializers.DateField()
+    free_days = serializers.IntegerField()
     shipping_company = serializers.UUIDField()
-    size = serializers.CharField(max_length=255)
+    size = serializers.UUIDField()
+    demurage_type = serializers.CharField(max_length=6)
+    
     
     def validate_shipping_company(self, data):
         try:
@@ -41,9 +41,15 @@ class CalculatorSerializer(serializers.Serializer):
         return company
     
     def validate_size(self, data):
-        sizes = ("20 feet", "40 feet")
+        try:
+            size = DemurageSize.objects.get(id=data, is_active=True)
+        except DemurageSize.DoesNotExist:
+            raise ValidationError(detail="This is not a valid size")
+        return size
+    
+    def validate_demurage_type(self, data):
+        choice = ("import", "export")
+        if data.lower() not in choice:
+            raise ValidationError(detail="Choices are either 'import' or 'export'")
         
-        if data not in sizes:
-            raise ValidationError(detail=f"Size must be either of {sizes}")
-        
-        return data
+        return data.lower()
