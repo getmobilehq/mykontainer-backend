@@ -1,7 +1,7 @@
 from accounts.permissions import IsAdminOrShippingAdmin, IsAdminorReadOnly, IsBayAdmin, IsShippingAdminOrBayAdmin
 from main.models import ShippingCompany
 from .models import Demurage, DemurageSize
-from .serializers import CalculatorSerializer, DemurageSerializer, SizeSerializer
+from .serializers import CalculatorSerializer, DemurageSerializer, SendEmailSerializer, SizeSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.response import Response
@@ -10,6 +10,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from django.core.mail import send_mail
 # Create your views here.
 
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
@@ -124,7 +125,7 @@ def calculate_demurage(request):
             size = serializer.validated_data.get('size')
             size:DemurageSize
             if serializer.validated_data.get('free_days') < size.free_days:
-                raise ValidationError(detail={"free_days":"Your value is less than allowed free days"})
+                raise ValidationError(detail={"error":"Your value is less than allowed free days"})
             
             day_range = (serializer.validated_data.get("end_date") - serializer.validated_data.get("start_date")).days
             
@@ -153,7 +154,7 @@ def calculate_demurage(request):
                                 }}
                 except Demurage.DoesNotExist:
                     errors = {"message":"failed",
-                            "errors":"unable to fetch range. Not found"
+                            "errors":"Cannot make this calculation now.\nPlease try again later.",
                             }
                     return Response(errors, status=status.HTTP_404_NOT_FOUND)
             else:
@@ -270,3 +271,14 @@ def demurage_size_detail(request, size_id):
 
 
         return Response({}, status = status.HTTP_204_NO_CONTENT)
+    
+@swagger_auto_schema(methods=["post"], request_body=SendEmailSerializer())
+@api_view(["POST"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def send_demurage_invoice(request):
+    pass
+    
+    
+    
+    

@@ -53,3 +53,16 @@ class CalculatorSerializer(serializers.Serializer):
             raise ValidationError(detail="Choices are either 'import' or 'export'")
         
         return data.lower()
+    
+    
+    
+class SendEmailSerializer(serializers.Serializer):
+    container_type = serializers.CharField(max_length=250)
+    start_date =  serializers.CharField(max_length=250)  
+    chargeable_days = serializers.CharField(max_length=250)
+    amount =  serializers.CharField(max_length=250)
+    vat_amount = serializers.CharField(max_length=250)
+    total =  serializers.CharField(max_length=250)
+    currency = serializers.CharField(max_length=250)
+    
+    
