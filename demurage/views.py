@@ -1,7 +1,7 @@
 from accounts.permissions import IsAdminOrShippingAdmin, IsAdminorReadOnly, IsBayAdmin, IsShippingAdminOrBayAdmin
 from main.models import ShippingCompany
 from .models import Demurage, DemurageSize
-from .serializers import CalculatorSerializer, DemurageSerializer, SendEmailSerializer, SizeSerializer
+from .serializers import CalculatorSerializer, DemurageSerializer, SizeSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.response import Response
@@ -10,7 +10,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from django.core.mail import send_mail
+# from django.core.mail import send_mail
 # Create your views here.
 
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
