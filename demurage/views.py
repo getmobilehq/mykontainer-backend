@@ -272,12 +272,12 @@ def demurage_size_detail(request, size_id):
 
         return Response({}, status = status.HTTP_204_NO_CONTENT)
     
-@swagger_auto_schema(methods=["post"], request_body=SendEmailSerializer())
-@api_view(["POST"])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-def send_demurage_invoice(request):
-    pass
+# @swagger_auto_schema(methods=["post"], request_body=SendEmailSerializer())
+# @api_view(["POST"])
+# @authentication_classes([JWTAuthentication])
+# @permission_classes([IsAuthenticated])
+# def send_demurage_invoice(request):
+#     pass
     
     
     
