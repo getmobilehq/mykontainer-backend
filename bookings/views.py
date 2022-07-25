@@ -5,7 +5,7 @@ from accounts.helpers.generators import generate_code
 from django.utils import timezone
 from accounts.permissions import IsBayAdmin, IsShippingAdminOrBayAdmin
 from .models import Booking, ShippingCompany, BayArea
-from .serializers import AddBookingSerializer, BookingCompleteSerializer, BookingSerializer
+from .serializers import AddBookingSerializer, BookingVerifySerializer, BookingSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -145,15 +145,15 @@ def booking_detail(request, booking_id):
     
     
 
-@swagger_auto_schema(methods=["POST"], request_body=BookingCompleteSerializer())
+@swagger_auto_schema(methods=["POST"], request_body=BookingVerifySerializer())
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsBayAdmin])
-def booking_complete(request):
+def verify_booking(request):
     """"""
     
     if request.method == "POST":
-        serializer = BookingCompleteSerializer(data=request.data)
+        serializer = BookingVerifySerializer(data=request.data)
         
         if serializer.is_valid():
             data = serializer.verify(request)
@@ -168,6 +168,34 @@ def booking_complete(request):
             }
 
             return Response(data, status = status.HTTP_400_BAD_REQUEST)
+
+
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsBayAdmin])
+def booking_complete(request, booking_id):
+    """"""
+    
+    if request.method == "GET":
+        
+        try:
+            obj = Booking.objects.get(id=booking_id, status="verified", is_active=True)
+            
+            obj.status="completed"
+            obj.save()
+            
+            return Response({"message":"success"}, status = status.HTTP_202_ACCEPTED)
+        
+        except Booking.DoesNotExist:
+            data = {
+                    'message' : "Does not exist or has not been verified"
+                }
+
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+        
+
 
 
 @api_view(['GET'])

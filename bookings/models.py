@@ -11,10 +11,13 @@ User = get_user_model()
 class Booking(models.Model):
     STATUS = (
         ("pending", "Pending"),
+        ("verified", "Verified"),
         ("completed", "Completed")
     )
+    
     SIZES = [("20 feet", "20 feet"),
                ("40 feet", "40 feet")]
+    
     id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
     user = models.ForeignKey(User, related_name="bookings", on_delete=models.CASCADE, null=True)
     shipping_company = models.ForeignKey(ShippingCompany, related_name="bookings", on_delete=models.CASCADE)

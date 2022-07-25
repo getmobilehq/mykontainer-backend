@@ -78,10 +78,9 @@ class AddBookingSerializer(serializers.Serializer):
             
         
         
-        
             
         
-class BookingCompleteSerializer(serializers.Serializer):
+class BookingVerifySerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6)
     
     
@@ -96,12 +95,11 @@ class BookingCompleteSerializer(serializers.Serializer):
         
         booking:Booking
         if booking.status == "pending":
-            booking.status = "completed"
-            booking.save()
             serializer = BookingSerializer(booking)
+            booking.status = "verified"
+            booking.save()
             
-            
-            return {"message": "Booking Completed", 
+            return {"message": "Booking Verified", 
                     'data':serializer.data}
         else:
             raise ValidationError({"message": "Code already used."})
