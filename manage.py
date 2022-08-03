@@ -2,6 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+load_dotenv(find_dotenv())
 
 
 def main():
