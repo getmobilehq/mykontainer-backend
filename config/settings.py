@@ -130,7 +130,7 @@ class Common(Configuration):
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/3.0/howto/static-files/
     STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
     # Default primary key field type
@@ -141,7 +141,7 @@ class Common(Configuration):
     
     
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = "Chuka from MyKontainer <hello@getmobile.tech>"
+    DEFAULT_FROM_EMAIL = "Felix from MyKontainer <noreply@mykontainer.app>"
 
     DJOSER = {
         "USER_ID_FIELD" : "id",
