@@ -304,7 +304,7 @@ class Production(Staging):
     EMAIL_PORT = 587 
     EMAIL_USE_TLS = True  
     
-    DATABASE ={
+    DATABASES ={
         "default": {
             "ENGINE": 'django.db.backends.postgresql_psycopg2',
             "NAME": os.getenv("DB_NAME"),
