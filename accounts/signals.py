@@ -9,11 +9,41 @@ from .models import ActivationOtp
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django_rest_passwordreset.signals import reset_password_token_created
 
 
 User = get_user_model()
 site_name = "MyKontainer"
-url="#"
+url="mykontainer.app"
+
+
+@receiver(reset_password_token_created)
+def password_reset_token_created(sender, instance,reset_password_token, *args, **kwargs):
+    
+    token = reset_password_token.key
+    user = reset_password_token.user
+
+    if user.is_admin:
+        token_url = f"https://admin.mykontainer.app/confirm-password/{token}"
+    else:
+        token_url = f"https://dashboard.mykontainer.app/forgot-password/{token}"
+    
+    msg_html = render_to_string('email/password_reset.html', {
+                        "token_url":token_url,
+                        'url':url,
+                        "user":user})
+    
+    message= 'Hello {},\n\nYou are receiving this message because you or someone else have requested the reset of the password for your account.\nClick on  the below to reset password:\n{}\n\nIf you did not request this please ignore this e-mail and your password would remain unchanged. \n\nRegards,\nMykontainer Support'.format(user.first_name, token_url)
+    
+    send_mail(
+        subject = "RESET PASSWORD FOR MYKONTAINER",
+        message= message,
+        html_message=msg_html,
+        from_email  = 'MyKontainer Support<noreply@mykontainer.app>',
+        
+        recipient_list= [user.email]
+    )
+    
 
 def generate_otp(n):
     return "".join([str(random.choice(range(10))) for _ in range(n)])
@@ -76,7 +106,7 @@ Cheers,
                     'first_name': str(user.first_name).title(),
                     'code':code,
                     'site_name':site_name,
-                    "url":"#"})
+                    "url":url})
     
     email_from = settings.Common.DEFAULT_FROM_EMAIL
     recipient_list = [user.email]

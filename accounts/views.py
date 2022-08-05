@@ -14,7 +14,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.signals import user_logged_in
 
-
 User = get_user_model()
 
 
@@ -202,4 +201,5 @@ def otp_verification(request):
         else:
 
             return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-        
+
+

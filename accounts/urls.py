@@ -1,7 +1,9 @@
 from django.urls import path, include
 from . import views
 
-urlpatterns = [
+
+urlpatterns = [    
+    path('users/reset_password/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path('', include('djoser.urls')),
     path('', include('djoser.urls.jwt')),
     path('login/', views.user_login),

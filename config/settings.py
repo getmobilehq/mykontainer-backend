@@ -56,6 +56,7 @@ class Common(Configuration):
         'drf_yasg',
         'coreapi',
         'corsheaders',
+        'django_rest_passwordreset',
     ]
 
     MIDDLEWARE = [
@@ -203,24 +204,24 @@ class Common(Configuration):
         api_secret = os.getenv('CLOUD_API_SECRET')
     )
 
-    LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
+    # LOGGING = {
+    # 'version': 1,
+    # 'disable_existing_loggers': False,
+    # 'handlers': {
+    #     'file': {
+    #         'level': 'DEBUG',
+    #         'class': 'logging.FileHandler',
+    #         'filename': 'debug.log',
+    #     },
+    # },
+    # 'loggers': {
+    #     'django': {
+    #         'handlers': ['file'],
+    #         'level': 'DEBUG',
+    #         'propagate': True,
+    #     },
+    # },
+# }
 class Development(Common):
     """
     The in-development settings and the default configuration.
@@ -301,8 +302,9 @@ class Production(Staging):
     EMAIL_HOST = "smtp.mailgun.org"
     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-    EMAIL_PORT = 587 
-    EMAIL_USE_TLS = True  
+    EMAIL_PORT = 465
+    EMAIL_USE_SSL = True
+    EMAIL_USE_TLS = False 
     
     DATABASES ={
         "default": {

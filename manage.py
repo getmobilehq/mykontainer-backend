@@ -13,7 +13,6 @@ def main():
     configuration = os.getenv('ENVIRONMENT', 'development').title()
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
     os.environ.setdefault('DJANGO_CONFIGURATION', configuration)
-    print(configuration)
 
     try:
         from configurations.management import execute_from_command_line
