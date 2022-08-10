@@ -15,10 +15,6 @@ class SizeSerializer(serializers.ModelSerializer):
         if data is None:
             raise ValidationError(["This field cannot be null"])
         
-        try:
-            ShippingCompany.objects.get(id=data, is_active=True)
-        except ShippingCompany.DoesNotExist:
-            raise ValidationError(["Enter a valid shipping company id"])
         return data
     
         
