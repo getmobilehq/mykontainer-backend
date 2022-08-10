@@ -16,10 +16,10 @@ class SizeSerializer(serializers.ModelSerializer):
             raise ValidationError(["This field cannot be null"])
         
         try:
-            obj = ShippingCompany.objects.get(id=data, is_active=True)
+            ShippingCompany.objects.get(id=data, is_active=True)
         except ShippingCompany.DoesNotExist:
             raise ValidationError(["Enter a valid shipping company id"])
-        return obj
+        return data
     
         
 class DemurageSerializer(serializers.ModelSerializer):
