@@ -26,7 +26,7 @@ def password_reset_token_created(sender, instance,reset_password_token, *args, *
     if user.is_admin:
         token_url = f"https://admin.mykontainer.app/confirm-password/{token}"
     else:
-        token_url = f"https://dashboard.mykontainer.app/forgot-password/{token}"
+        token_url = f"https://dashboard.mykontainer.app/reset-password/{token}"
     
     msg_html = render_to_string('email/password_reset.html', {
                         "token_url":token_url,
