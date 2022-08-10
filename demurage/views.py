@@ -143,7 +143,7 @@ def calculate_demurage(request):
                     
                     data = {"message":"success",
                             "data":{
-                                "container_type":size.size,
+                                "container_type":f"{size.container_type} {size.size}",
                                 "start_date":serializer.validated_data.get("start_date"),
                                 "end_date":serializer.validated_data.get("end_date"),
                                 "chargeable_days":days,
@@ -161,7 +161,7 @@ def calculate_demurage(request):
                 data = {
                     "message":"success",
                     "data":{
-                                "container_type":size.size,
+                                "container_type":f"{size.container_type} {size.size}",
                                 "start_date":serializer.validated_data.get("start_date"),
                                 "end_date":serializer.validated_data.get("end_date"),
                                 "chargeable_days":0,
@@ -189,7 +189,10 @@ def calculate_demurage(request):
 def demurage_sizes(request):
     
     if request.method=="GET":
+        shipping_company = request.GET.get('shipping_company')
         objs = DemurageSize.objects.filter(is_active=True)
+        if shipping_company:
+            objs = objs.filter(shipping_company=shipping_company)
         serializer= SizeSerializer(objs, many=True)
         
         data = {"message":"success",

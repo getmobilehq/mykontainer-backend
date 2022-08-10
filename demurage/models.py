@@ -5,19 +5,21 @@ from django.forms import model_to_dict
 # Create your models here.
 
 class DemurageSize(models.Model):
-    SIZES = (('Dry 20 ft', 'Dry 20 ft'),
-             ('Reefer 20 ft', 'Reefer 20 ft'),
-             ('Special 20 ft', 'Special 20 ft'),
-             ('Dry 40 ft', 'Dry 40 ft'),
-             ('Reefer 40 ft', 'Reefer 40 ft'),
-             ("Special 40 ft", "Special 40 ft"),
-             ("Dry 45 ft", "Dry 45 ft"),
-             ("Reefer 45 ft", "Reefer 45 ft"))
+    # SIZES = (('Dry 20 ft', 'Dry 20 ft'),
+    #          ('Reefer 20 ft', 'Reefer 20 ft'),
+    #          ('Special 20 ft', 'Special 20 ft'),
+    #          ('Dry 40 ft', 'Dry 40 ft'),
+    #          ('Reefer 40 ft', 'Reefer 40 ft'),
+    #          ("Special 40 ft", "Special 40 ft"),
+    #          ("Dry 45 ft", "Dry 45 ft"),
+    #          ("Reefer 45 ft", "Reefer 45 ft"))
 		
 		
 
     id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
-    size = models.CharField(max_length=255, unique=True, choices=SIZES)
+    shipping_company = models.ForeignKey("main.ShippingCompany", on_delete=models.CASCADE, null=True, blank=True, related_name="demurage_size")
+    container_type = models.CharField(max_length=255)
+    size = models.CharField(max_length=255)
     free_days = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -41,7 +43,7 @@ class Demurage(models.Model):
     price_per_day = models.FloatField()
     size = models.ForeignKey("demurage.DemurageSize", on_delete=models.CASCADE, related_name="ranges", null=True)
     demurage_type = models.CharField(max_length=250, blank=True, null=True, choices=(("import", "Import"),
-            ("export","Export")))
+    ("export","Export")))
     is_active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
     

@@ -9,6 +9,16 @@ class SizeSerializer(serializers.ModelSerializer):
         model = DemurageSize
         fields = '__all__'
         
+    def validate_shipping_company(self, data):
+        if data is None:
+            raise ValidationError(["This field cannot be null"])
+        
+        try:
+            obj = ShippingCompany.objects.get(id=data, is_active=True)
+        except ShippingCompany.DoesNotExist:
+            raise ValidationError(["Enter a valid shipping company id"])
+        return obj
+        
 class DemurageSerializer(serializers.ModelSerializer):
     shipping_company_detail = serializers.ReadOnlyField()
     size_detail = serializers.ReadOnlyField()
