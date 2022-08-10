@@ -263,9 +263,8 @@ class Staging(Common):
     EMAIL_HOST = 'smtp.gmass.co'
     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-    EMAIL_PORT = 465
-    EMAIL_USE_SSL = True
-    EMAIL_USE_TLS = False  # use port 587
+    EMAIL_PORT = 25 
+    EMAIL_USE_TLS = True    # use port 587
     
     DATABASE ={
         "default": {
