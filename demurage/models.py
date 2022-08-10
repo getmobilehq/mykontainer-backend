@@ -35,7 +35,7 @@ class DemurageSize(models.Model):
         self.save()
         
     def __str__(self):
-        return self.size
+        return f"{self.container_type} {self.size}"
         
         
 
