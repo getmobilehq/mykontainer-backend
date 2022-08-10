@@ -24,6 +24,11 @@ class DemurageSize(models.Model):
     is_active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
     
+    
+    @property
+    def shipping_company_detail(self):
+        return model_to_dict(self.shipping_company, exclude=["date_added","is_active"])
+        
     def delete(self):
         self.is_active=False
         self.ranges.update(is_active=False)

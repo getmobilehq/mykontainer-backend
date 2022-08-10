@@ -5,6 +5,8 @@ from rest_framework.exceptions import ValidationError
 
 
 class SizeSerializer(serializers.ModelSerializer):
+    shipping_company_detail = serializers.ReadOnlyField()
+    
     class Meta:
         model = DemurageSize
         fields = '__all__'
@@ -18,6 +20,7 @@ class SizeSerializer(serializers.ModelSerializer):
         except ShippingCompany.DoesNotExist:
             raise ValidationError(["Enter a valid shipping company id"])
         return obj
+    
         
 class DemurageSerializer(serializers.ModelSerializer):
     shipping_company_detail = serializers.ReadOnlyField()
