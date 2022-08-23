@@ -177,7 +177,6 @@ def calculate_demurage(request):
                     except  Demurage.DoesNotExist:
                         errors = {"message":"failed",
                                 "errors":"Cannot make this calculation now.\nPlease try again later.",
-                                "size"
                                 }
                         return Response(errors, status=status.HTTP_404_NOT_FOUND)
             else:
