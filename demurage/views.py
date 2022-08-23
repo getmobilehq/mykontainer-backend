@@ -132,34 +132,54 @@ def calculate_demurage(request):
             
             if day_range >= size.free_days:
                 days = day_range - free_days 
-                try:
-                    rate = Demurage.objects.get(shipping_company=company, 
-                                        size=size, 
-                                        start_day__lte=days, 
-                                        end_day__gte=days, 
-                                        demurage_type=demurage_type,
-                                        is_active=True)
-                    amount = days*rate.price_per_day
-                    vat_amount = amount*VAT
+                if days <=0:
                     
-                    data = {"message":"success",
+                    data = {
+                            "message":"success",
                             "data":{
-                                "container_type":f"{size.container_type} {size.size}",
-                                "start_date":serializer.validated_data.get("start_date"),
-                                "end_date":serializer.validated_data.get("end_date"),
-                                "chargeable_days":days,
-                                "free_days": free_days,
-                                "amount" : amount,
-                                "vat_amount":vat_amount,
-                                "total":amount+vat_amount,
-                                "currency": "NGN"
-                                }}
-                except  Demurage.DoesNotExist:
-                    errors = {"message":"failed",
-                            "errors":"Cannot make this calculation now.\nPlease try again later.",
-                            "size"
+                                        "container_type":f"{size.container_type} {size.size}",
+                                        "start_date":serializer.validated_data.get("start_date"),
+                                        "end_date":serializer.validated_data.get("end_date"),
+                                        "chargeable_days":0,
+                                        "free_days": free_days
+                                        "amount" : 0,
+                                        "vat_amount":0,
+                                        "total":0,
+                                        "currency": "NGN"
                             }
-                    return Response(errors, status=status.HTTP_404_NOT_FOUND)
+                        }
+                        
+                    return Response(data, status=status.HTTP_201_CREATED)
+
+                else: 
+                    try:
+                        rate = Demurage.objects.get(shipping_company=company, 
+                                            size=size, 
+                                            start_day__lte=days, 
+                                            end_day__gte=days, 
+                                            demurage_type=demurage_type,
+                                            is_active=True)
+                        amount = days*rate.price_per_day
+                        vat_amount = amount*VAT
+                        
+                        data = {"message":"success",
+                                "data":{
+                                    "container_type":f"{size.container_type} {size.size}",
+                                    "start_date":serializer.validated_data.get("start_date"),
+                                    "end_date":serializer.validated_data.get("end_date"),
+                                    "chargeable_days":days,
+                                    "free_days": free_days,
+                                    "amount" : amount,
+                                    "vat_amount":vat_amount,
+                                    "total":amount+vat_amount,
+                                    "currency": "NGN"
+                                    }}
+                    except  Demurage.DoesNotExist:
+                        errors = {"message":"failed",
+                                "errors":"Cannot make this calculation now.\nPlease try again later.",
+                                "size"
+                                }
+                        return Response(errors, status=status.HTTP_404_NOT_FOUND)
             else:
                 data = {
                     "message":"success",
