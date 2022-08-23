@@ -124,14 +124,14 @@ def calculate_demurage(request):
             
             size = serializer.validated_data.get('size')
             size:DemurageSize
-            free_ = serializer.validated_data.get('free_days')
+            free_days = serializer.validated_data.get('free_days')
             if serializer.validated_data.get('free_days') < size.free_days:
                 raise ValidationError(detail={"error":"Your value is less than allowed free days"})
             
             day_range = (serializer.validated_data.get("end_date") - serializer.validated_data.get("start_date")).days + 1
             
             if day_range >= size.free_days:
-                days = day_range - free_ 
+                days = day_range - free_days 
                 try:
                     rate = Demurage.objects.get(shipping_company=company, 
                                         size=size, 
@@ -148,14 +148,16 @@ def calculate_demurage(request):
                                 "start_date":serializer.validated_data.get("start_date"),
                                 "end_date":serializer.validated_data.get("end_date"),
                                 "chargeable_days":days,
+                                "free_days": free_days,
                                 "amount" : amount,
                                 "vat_amount":vat_amount,
                                 "total":amount+vat_amount,
                                 "currency": "NGN"
                                 }}
-                except Demurage.DoesNotExist:
+                except  Demurage.DoesNotExist:
                     errors = {"message":"failed",
                             "errors":"Cannot make this calculation now.\nPlease try again later.",
+                            "size"
                             }
                     return Response(errors, status=status.HTTP_404_NOT_FOUND)
             else:
@@ -166,6 +168,7 @@ def calculate_demurage(request):
                                 "start_date":serializer.validated_data.get("start_date"),
                                 "end_date":serializer.validated_data.get("end_date"),
                                 "chargeable_days":0,
+                                "free_days": free_days
                                 "amount" : 0,
                                 "vat_amount":0,
                                 "total":0,
