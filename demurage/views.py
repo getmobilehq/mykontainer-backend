@@ -124,13 +124,14 @@ def calculate_demurage(request):
             
             size = serializer.validated_data.get('size')
             size:DemurageSize
+            free_ = serializer.validated_data.get('free_days')
             if serializer.validated_data.get('free_days') < size.free_days:
                 raise ValidationError(detail={"error":"Your value is less than allowed free days"})
             
             day_range = (serializer.validated_data.get("end_date") - serializer.validated_data.get("start_date")).days + 1
             
             if day_range >= size.free_days:
-                days = day_range - size.free_days 
+                days = day_range - free_ 
                 try:
                     rate = Demurage.objects.get(shipping_company=company, 
                                         size=size, 
