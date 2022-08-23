@@ -127,7 +127,7 @@ def calculate_demurage(request):
             if serializer.validated_data.get('free_days') < size.free_days:
                 raise ValidationError(detail={"error":"Your value is less than allowed free days"})
             
-            day_range = (serializer.validated_data.get("end_date") - serializer.validated_data.get("start_date")).days
+            day_range = (serializer.validated_data.get("end_date") - serializer.validated_data.get("start_date")).days + 1
             
             if day_range >= size.free_days:
                 days = day_range - size.free_days 
