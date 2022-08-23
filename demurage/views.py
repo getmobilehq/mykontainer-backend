@@ -132,7 +132,7 @@ def calculate_demurage(request):
             
             if day_range >= size.free_days:
                 days = day_range - free_days 
-                if days <=0:
+                if days <= 0:
                     
                     data = {
                             "message":"success",
@@ -141,7 +141,7 @@ def calculate_demurage(request):
                                         "start_date":serializer.validated_data.get("start_date"),
                                         "end_date":serializer.validated_data.get("end_date"),
                                         "chargeable_days":0,
-                                        "free_days": free_days
+                                        "free_days": free_days,
                                         "amount" : 0,
                                         "vat_amount":0,
                                         "total":0,
@@ -188,7 +188,7 @@ def calculate_demurage(request):
                                 "start_date":serializer.validated_data.get("start_date"),
                                 "end_date":serializer.validated_data.get("end_date"),
                                 "chargeable_days":0,
-                                "free_days": free_days
+                                "free_days": free_days,
                                 "amount" : 0,
                                 "vat_amount":0,
                                 "total":0,
