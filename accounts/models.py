@@ -61,7 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                        'shipping_company',
                        'bay_area',
                        'company_name',
-                       'user_type'
+                       'user_type',
                        'is_disabled'
                        ]
 
