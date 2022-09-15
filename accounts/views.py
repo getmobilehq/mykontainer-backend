@@ -117,43 +117,49 @@ def user_login(request):
             user = authenticate(request, email = data['email'], password = data['password'])
             if user is not None:
                 if user.is_active==True:
-                
-                    
-                    try:
-                        
-                        refresh = RefreshToken.for_user(user)
-
-                        user_detail = {}
-                        user_detail['id']   = user.id
-                        user_detail['first_name'] = user.first_name
-                        user_detail['last_name'] = user.last_name
-                        user_detail['email'] = user.email
-                        user_detail['phone'] = user.phone
-                        user_detail['role'] = user.role
-                        user_detail['is_admin'] = user.is_admin
-                        # user_detail['image_url'] = user.image_url
-                        user_detail['access'] = str(refresh.access_token)
-                        user_detail['refresh'] = str(refresh)
-                        user_logged_in.send(sender=user.__class__,
-                                            request=request, user=user)
-
+                    if user.is_disabled == True:
                         data = {
-    
-                        "message":"success",
-                        'data' : user_detail,
+                
+                        'error': 'This account has been suspended. Please contact the administrator'
                         }
-                        return Response(data, status=status.HTTP_200_OK)
-                    
+                        return Response(data, status=status.HTTP_403_FORBIDDEN)
+                        
+                    else:
+                        try:
+                            
+                            refresh = RefreshToken.for_user(user)
 
-                    except Exception as e:
-                        raise e
+                            user_detail = {}
+                            user_detail['id']   = user.id
+                            user_detail['first_name'] = user.first_name
+                            user_detail['last_name'] = user.last_name
+                            user_detail['email'] = user.email
+                            user_detail['phone'] = user.phone
+                            user_detail['role'] = user.role
+                            user_detail['is_admin'] = user.is_admin
+                            # user_detail['image_url'] = user.image_url
+                            user_detail['access'] = str(refresh.access_token)
+                            user_detail['refresh'] = str(refresh)
+                            user_logged_in.send(sender=user.__class__,
+                                                request=request, user=user)
+
+                            data = {
+        
+                            "message":"success",
+                            'data' : user_detail,
+                            }
+                            return Response(data, status=status.HTTP_200_OK)
+                        
+
+                        except Exception as e:
+                            raise e
                 
                 else:
                     data = {
                     
                     'error': 'This account has not been activated'
                     }
-                return Response(data, status=status.HTTP_403_FORBIDDEN)
+                    return Response(data, status=status.HTTP_403_FORBIDDEN)
 
             else:
                 data = {
@@ -203,3 +209,41 @@ def otp_verification(request):
             return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAdminUser])
+def suspend_user(request, user_id):
+    
+    """Api view for suspending users """
+
+    if request.method == 'GET':
+        
+        try:
+            user = User.objects.get(id=user_id, is_active=True, is_disabled=False)
+            user.is_disabled = True
+            user.save()
+            return Response({"message": "User is suspended"}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+
+            return Response({"message":"User not activated or has been suspended already"}, status = status.HTTP_400_BAD_REQUEST)
+        
+        
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAdminUser])
+def unsuspend_user(request, user_id):
+    
+    """Api view to unsuspend users """
+
+    if request.method == 'GET':
+        
+        try:
+            user = User.objects.get(id=user_id, is_active=True, is_disabled=True)
+            user.is_disabled = False
+            user.save()
+            return Response({"message": "User is re-enabled"}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+
+            return Response({"message":"User not activated or has been re-enabled already"}, status = status.HTTP_400_BAD_REQUEST)

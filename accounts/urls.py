@@ -11,4 +11,7 @@ urlpatterns = [
     path('admins/bay/', views.bay_admin),
     path('otp/verify/', views.otp_verification),
     path('otp/new/', views.reset_otp),
+    path("users/<uuid:user_id>/suspend/", views.suspend_user),
+    path("users/<uuid:user_id>/unsuspend/", views.unsuspend_user),
+    
 ]

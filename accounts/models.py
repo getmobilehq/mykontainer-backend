@@ -47,6 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff      = models.BooleanField(_('staff'), default=False)
     is_admin      = models.BooleanField(_('admin'), default= False)
     is_active     = models.BooleanField(_('active'), default=True)
+    is_disabled = models.BooleanField(_('disabled'), default=False)
     date_joined   = models.DateTimeField(_('date joined'), auto_now_add=True)
     
     objects = UserManager()
@@ -61,6 +62,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                        'bay_area',
                        'company_name',
                        'user_type'
+                       'is_disabled'
                        ]
 
     class Meta:

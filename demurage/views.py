@@ -130,6 +130,8 @@ def calculate_demurage(request):
             
             day_range = (serializer.validated_data.get("end_date") - serializer.validated_data.get("start_date")).days + 1
             
+            
+            
             if day_range >= size.free_days:
                 days = day_range - free_days 
                 if days <= 0:
@@ -153,12 +155,13 @@ def calculate_demurage(request):
 
                 else: 
                     try:
-                        rate = Demurage.objects.get(shipping_company=company, 
+                        rate = Demurage.objects.filter(shipping_company=company, 
                                             size=size, 
-                                            start_day__lte=days, 
-                                            end_day__gte=days, 
                                             demurage_type=demurage_type,
                                             is_active=True)
+                        
+                        
+                            
                         amount = days*rate.price_per_day
                         vat_amount = amount*VAT
                         
@@ -169,9 +172,9 @@ def calculate_demurage(request):
                                     "end_date":serializer.validated_data.get("end_date"),
                                     "chargeable_days":days,
                                     "free_days": free_days,
-                                    "amount" : amount,
-                                    "vat_amount":vat_amount,
-                                    "total":amount+vat_amount,
+                                    "amount" : round(amount, 2),
+                                    "vat_amount":round(vat_amount, 2),
+                                    "total":round(amount+vat_amount, 2),
                                     "currency": "NGN"
                                     }}
                     except  Demurage.DoesNotExist:
