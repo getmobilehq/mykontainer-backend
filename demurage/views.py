@@ -145,7 +145,7 @@ def calculate_demurage(request):
                 a.write(str("na me dey work") + "\n")
                 
                 data = {
-                        "message":"success",
+                        "message":"failed",
                         "data":{
                                     "container_type":f"{size.container_type} {size.size}",
                                     "start_date":serializer.validated_data.get("start_date"),
