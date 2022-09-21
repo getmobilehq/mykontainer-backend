@@ -1,3 +1,4 @@
+from datetime import timedelta, datetime
 from accounts.permissions import IsAdminOrShippingAdmin, IsAdminorReadOnly, IsBayAdmin, IsShippingAdminOrBayAdmin
 from main.models import ShippingCompany
 from .models import Demurage, DemurageSize
@@ -10,12 +11,16 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from .demurage_helper import amount_per_day
+
 # from django.core.mail import send_mail
 # Create your views here.
 
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
 VAT = 0.075
+
+HIGHEST_DAY_START = 22
 
 @swagger_auto_schema(methods=["POST"], request_body=DemurageSerializer())
 @api_view(["GET", 'POST'])
@@ -107,6 +112,7 @@ def demurage_detail(request, rate_id):
 
         return Response({}, status = status.HTTP_204_NO_CONTENT)
     
+
     
 
 @swagger_auto_schema(methods=["POST"], request_body=CalculatorSerializer())
@@ -130,73 +136,88 @@ def calculate_demurage(request):
             
             day_range = (serializer.validated_data.get("end_date") - serializer.validated_data.get("start_date")).days + 1
             
+            chargeable_days = day_range - free_days
             
             
-            if day_range >= size.free_days:
-                days = day_range - free_days 
-                if days <= 0:
-                    
-                    data = {
-                            "message":"success",
-                            "data":{
-                                        "container_type":f"{size.container_type} {size.size}",
-                                        "start_date":serializer.validated_data.get("start_date"),
-                                        "end_date":serializer.validated_data.get("end_date"),
-                                        "chargeable_days":0,
-                                        "free_days": free_days,
-                                        "amount" : 0,
-                                        "vat_amount":0,
-                                        "total":0,
-                                        "currency": "NGN"
-                            }
-                        }
-                        
-                    return Response(data, status=status.HTTP_201_CREATED)
-
-                else: 
-                    try:
-                        rate = Demurage.objects.filter(shipping_company=company, 
-                                            size=size, 
-                                            demurage_type=demurage_type,
-                                            is_active=True)
-                        
-                        
-                            
-                        amount = days*rate.price_per_day
-                        vat_amount = amount*VAT
-                        
-                        data = {"message":"success",
-                                "data":{
+            # if chargeable_days <= 0:
+            if chargeable_days <= 0:
+                
+                data = {
+                        "message":"success",
+                        "data":{
                                     "container_type":f"{size.container_type} {size.size}",
                                     "start_date":serializer.validated_data.get("start_date"),
                                     "end_date":serializer.validated_data.get("end_date"),
-                                    "chargeable_days":days,
+                                    "chargeable_days":0,
                                     "free_days": free_days,
-                                    "amount" : round(amount, 2),
-                                    "vat_amount":round(vat_amount, 2),
-                                    "total":round(amount+vat_amount, 2),
+                                    "amount" : 0,
+                                    "vat_amount":0,
+                                    "total":0,
                                     "currency": "NGN"
-                                    }}
-                    except  Demurage.DoesNotExist:
-                        errors = {"message":"failed",
-                                "errors":"Cannot make this calculation now.\nPlease try again later.",
-                                }
-                        return Response(errors, status=status.HTTP_404_NOT_FOUND)
-            else:
-                data = {
-                    "message":"success",
-                    "data":{
+                        }
+                    }
+                    
+                return Response(data, status=status.HTTP_201_CREATED)
+
+            else: 
+                try:
+                    rate = Demurage.objects.filter(shipping_company=company, 
+                                        size=size, 
+                                        demurage_type=demurage_type,
+                                        is_active=True)
+                    
+                    
+                    days_to_charge = sorted([i +1 for i in range(free_days, chargeable_days)]) #get days
+                    amounts = [] #amounts for various days the client owes
+                    rates = Demurage.objects.filter(shipping_company=company, 
+                                                    size=size, 
+                                                    demurage_type=demurage_type,
+                                                    is_active=True)
+                    
+                    for day in days_to_charge:
+                        if day == HIGHEST_DAY_START:
+                            highest_days_amount = amount_per_day(day, rates) #get amount from 22 days and above
+                            day_index = days_to_charge.index(day) #find index of 22 day in days to charge list
+                            amounts.append(len(days_to_charge[day_index:])*highest_days_amount) #slice the list, get the length and multiply it by the amount to get the value of all the days above 22
+                            break
+                        amounts.append(amount_per_day(day, rates))        
+                    
+                    amount = sum(amounts) #get the amount from the amount list
+                    
+                    vat_amount = amount*VAT
+                    
+                    data = {"message":"success",
+                            "data":{
                                 "container_type":f"{size.container_type} {size.size}",
                                 "start_date":serializer.validated_data.get("start_date"),
                                 "end_date":serializer.validated_data.get("end_date"),
-                                "chargeable_days":0,
+                                "chargeable_days":chargeable_days,
                                 "free_days": free_days,
-                                "amount" : 0,
-                                "vat_amount":0,
-                                "total":0,
+                                "amount" : round(amount, 2),
+                                "vat_amount":round(vat_amount, 2),
+                                "total":round(amount+vat_amount, 2),
                                 "currency": "NGN"
-                    }
-                }
+                                }}
+                except  Demurage.DoesNotExist:
+                    errors = {"message":"failed",
+                            "errors":"Cannot make this calculation now.\nPlease try again later.",
+                            }
+                    return Response(errors, status=status.HTTP_404_NOT_FOUND)
+            # else:
+            #     data = {
+            #         "message":"success",
+            #         "data":{
+            #                     "container_type":f"{size.container_type} {size.size}",
+            #                     "start_date":serializer.validated_data.get("start_date"),
+            #                     "end_date":serializer.validated_data.get("end_date"),
+            #                     "chargeable_days":0,
+            #                     "free_days": free_days,
+            #                     "amount" : 0,
+            #                     "vat_amount":0,
+            #                     "total":0,
+            #                     "currency": "NGN"
+            #         }
+            #     }
                 
             return Response(data, status=status.HTTP_201_CREATED)
         else:
