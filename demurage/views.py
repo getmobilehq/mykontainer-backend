@@ -122,6 +122,7 @@ def calculate_demurage(request):
     
     
     if request.method=='POST':
+        a = open("file.txt", "w")
         serializer = CalculatorSerializer(data=request.data)
         
         if serializer.is_valid():
@@ -138,9 +139,10 @@ def calculate_demurage(request):
             
             chargeable_days = day_range - free_days
             
-            
+            a.write(str(chargeable_days) + "\n")
             # if chargeable_days <= 0:
             if chargeable_days <= 0:
+                a.write(str("na me dey work") + "\n")
                 
                 data = {
                         "message":"success",
@@ -161,7 +163,7 @@ def calculate_demurage(request):
 
             else: 
                 try:                
-                    a = open("file.txt", "w")
+                    
                     days_to_charge = sorted([i +1 for i in range(free_days, chargeable_days)]) #get days
                     a.write(str(days_to_charge) + "\n")
                     amounts = [] #amounts for various days the client owes
@@ -196,29 +198,16 @@ def calculate_demurage(request):
                                 "total":round(amount+vat_amount, 2),
                                 "currency": "NGN"
                                 }}
-                    
+                    a.close()
+                    return Response(data, status=status.HTTP_201_CREATED)
                 except  Demurage.DoesNotExist:
                     errors = {"message":"failed",
                             "errors":"Cannot make this calculation now.\nPlease try again later.",
                             }
                     return Response(errors, status=status.HTTP_404_NOT_FOUND)
-            # else:
-            #     data = {
-            #         "message":"success",
-            #         "data":{
-            #                     "container_type":f"{size.container_type} {size.size}",
-            #                     "start_date":serializer.validated_data.get("start_date"),
-            #                     "end_date":serializer.validated_data.get("end_date"),
-            #                     "chargeable_days":0,
-            #                     "free_days": free_days,
-            #                     "amount" : 0,
-            #                     "vat_amount":0,
-            #                     "total":0,
-            #                     "currency": "NGN"
-            #         }
-            #     }
+            
                 
-            return Response(data, status=status.HTTP_201_CREATED)
+            
         else:
             errors = {
                 "message":"failed",
