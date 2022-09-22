@@ -135,8 +135,9 @@ def calculate_demurage(request):
                 raise ValidationError(detail={"error":"Your value is less than allowed free days"})
             
             day_range = (serializer.validated_data.get("end_date") - serializer.validated_data.get("start_date")).days + 1
-            
+            # print(day_range)
             chargeable_days = day_range - free_days
+            # print(chargeable_days)
             
             # if chargeable_days <= 0:
             if chargeable_days <= 0:
@@ -161,8 +162,8 @@ def calculate_demurage(request):
             else: 
                 try:                
                     
-                    days_to_charge = sorted([i +1 for i in range(free_days, chargeable_days)]) #get days
-                    print(days_to_charge)
+                    days_to_charge = sorted([i +1 for i in range(free_days, day_range)]) #get days
+                    # print(days_to_charge)
                     amounts = [] #amounts for various days the client owes
                     rates = Demurage.objects.filter(shipping_company=company, 
                                                     size=size, 
@@ -176,7 +177,10 @@ def calculate_demurage(request):
                             amounts.append(len(days_to_charge[day_index:])*highest_days_amount) #slice the list, get the length and multiply it by the amount to get the value of all the days above 22
                             break
                         amounts.append(amount_per_day(day, rates))        
-                    
+                    # print(amounts)
+                    # print(company.name)
+                    # print(f"{size.container_type} {size.size}")
+                    # print(list(zip(amounts,days_to_charge)))
                     
                     amount = sum(amounts) #get the amount from the amount list
                     
