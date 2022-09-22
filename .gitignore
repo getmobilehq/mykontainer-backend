@@ -92,3 +92,4 @@ db.sqlite3
 staticfiles
 static
 kontainer_env
+data.json

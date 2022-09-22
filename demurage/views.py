@@ -122,13 +122,12 @@ def calculate_demurage(request):
     
     
     if request.method=='POST':
-        a = open("file.txt", "w")
         serializer = CalculatorSerializer(data=request.data)
         
         if serializer.is_valid():
             demurage_type = serializer.validated_data.get("demurage_type")
             company = serializer.validated_data.get("shipping_company")
-            
+            company:ShippingCompany
             size = serializer.validated_data.get('size')
             size:DemurageSize
             free_days = serializer.validated_data.get('free_days')
@@ -139,13 +138,11 @@ def calculate_demurage(request):
             
             chargeable_days = day_range - free_days
             
-            a.write(str(chargeable_days) + "\n")
             # if chargeable_days <= 0:
             if chargeable_days <= 0:
-                a.write(str("na me dey work") + "\n")
                 
                 data = {
-                        "message":"failed",
+                        "message":"success",
                         "data":{
                                     "container_type":f"{size.container_type} {size.size}",
                                     "start_date":serializer.validated_data.get("start_date"),
@@ -165,14 +162,13 @@ def calculate_demurage(request):
                 try:                
                     
                     days_to_charge = sorted([i +1 for i in range(free_days, chargeable_days)]) #get days
-                    a.write(str(days_to_charge) + "\n")
+                    print(days_to_charge)
                     amounts = [] #amounts for various days the client owes
                     rates = Demurage.objects.filter(shipping_company=company, 
                                                     size=size, 
                                                     demurage_type=demurage_type,
                                                     is_active=True)
                     
-                    a.write(str(rates) + "\n")
                     for day in days_to_charge:
                         if day == HIGHEST_DAY_START:
                             highest_days_amount = amount_per_day(day, rates) #get amount from 22 days and above
@@ -181,7 +177,7 @@ def calculate_demurage(request):
                             break
                         amounts.append(amount_per_day(day, rates))        
                     
-                    a.write(str(amounts) + "\n")
+                    
                     amount = sum(amounts) #get the amount from the amount list
                     
                     vat_amount = amount*VAT
@@ -198,7 +194,6 @@ def calculate_demurage(request):
                                 "total":round(amount+vat_amount, 2),
                                 "currency": "NGN"
                                 }}
-                    a.close()
                     return Response(data, status=status.HTTP_201_CREATED)
                 except  Demurage.DoesNotExist:
                     errors = {"message":"failed",
