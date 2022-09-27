@@ -20,7 +20,7 @@ SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
 VAT = 0.075
 
-HIGHEST_DAY_START = 22
+HIGHEST_DAY_START = 25
 
 @swagger_auto_schema(methods=["POST"], request_body=DemurageSerializer())
 @api_view(["GET", 'POST'])
