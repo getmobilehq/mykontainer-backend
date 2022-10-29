@@ -236,7 +236,7 @@ def demurage_sizes(request):
                 "data" : serializer.data}
             
         return Response(data, status=status.HTTP_200_OK)
-    
+
     elif request.method=='POST':
         serializer = SizeSerializer(data=request.data)
         
