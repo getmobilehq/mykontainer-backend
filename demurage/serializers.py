@@ -34,6 +34,7 @@ class DemurageSerializer(serializers.ModelSerializer):
         return data
     
 class CalculatorSerializer(serializers.Serializer):
+    email = serializers.EmailField()
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     free_days = serializers.IntegerField()

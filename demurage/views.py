@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 from accounts.permissions import IsAdminOrShippingAdmin, IsAdminorReadOnly, IsBayAdmin, IsShippingAdminOrBayAdmin
 from main.models import ShippingCompany
-from .models import Demurage, DemurageSize
+from .models import Demurage, DemurageSize, DemurrageCalculations
 from .serializers import CalculatorSerializer, DemurageSerializer, SizeSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework import status
@@ -125,6 +125,7 @@ def calculate_demurage(request):
         serializer = CalculatorSerializer(data=request.data)
         
         if serializer.is_valid():
+            email = serializer.validated_data.get('email')
             demurage_type = serializer.validated_data.get("demurage_type")
             company = serializer.validated_data.get("shipping_company")
             company:ShippingCompany
@@ -156,7 +157,7 @@ def calculate_demurage(request):
                                     "currency": "NGN"
                         }
                     }
-                    
+                DemurrageCalculations.objects.create(**data, email=email)
                 return Response(data, status=status.HTTP_201_CREATED)
 
             else: 
@@ -172,9 +173,9 @@ def calculate_demurage(request):
                     
                     for day in days_to_charge:
                         if day == HIGHEST_DAY_START:
-                            highest_days_amount = amount_per_day(day, rates) #get amount from 22 days and above
+                            highest_days_amount = amount_per_day(day, rates) #get amount from 25 days and above
                             day_index = days_to_charge.index(day) #find index of 22 day in days to charge list
-                            amounts.append(len(days_to_charge[day_index:])*highest_days_amount) #slice the list, get the length and multiply it by the amount to get the value of all the days above 22
+                            amounts.append(len(days_to_charge[day_index:])*highest_days_amount) #slice the list, get the length and multiply it by the amount to get the value of all the days above 25
                             break
                         amounts.append(amount_per_day(day, rates))        
                     # print(amounts)
@@ -198,6 +199,8 @@ def calculate_demurage(request):
                                 "total":round(amount+vat_amount, 2),
                                 "currency": "NGN"
                                 }}
+                    values = data['data']
+                    DemurrageCalculations.objects.create(**values, email=email)
                     return Response(data, status=status.HTTP_201_CREATED)
                 except  Demurage.DoesNotExist:
                     errors = {"message":"failed",

@@ -66,3 +66,28 @@ class Demurage(models.Model):
     @property
     def size_detail(self):
         return model_to_dict(self.size, exclude=["date_added","is_active"])
+    
+    
+    
+class DemurrageCalculations(models.Model):
+    email = models.EmailField()
+    container_type= models.CharField(max_length=255)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    chargeable_days = models.IntegerField(default=0)
+    free_days = models.IntegerField()
+    amount = models.FloatField()
+    vat_amount = models.FloatField()
+    total = models.FloatField()
+    currency = models.CharField(max_length=5, default= "NGN")
+    is_active= models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    
+    
+    def delete(self):
+        self.is_active=False
+        self.save()
+    
+    def __str__(self):
+        return f"{self.email} -- {self.date_created}"
+    
