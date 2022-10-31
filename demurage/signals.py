@@ -6,6 +6,8 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from .models import DemurrageCalculations
 
+site_name = "MyKontainer"
+url="mykontainer.app"
 
 @receiver(post_save, sender=DemurrageCalculations)
 def send_details(sender, instance, created, **kwargs):
@@ -29,16 +31,24 @@ Currency: {instance.currency}
 Cheers,
 MyKontainer Team   
 """   
-        # msg_html = render_to_string('signup_email.html', {
-        #                 'first_name': str(instance.first_name).title(),
-        #                 'code':code,
-        #                 'url':url})
+        msg_html = render_to_string('demurage/templates/calculator_invoice.html', {
+                        'container_type': instance.container_type,
+                        'start_date':instance.start_date,
+                        'end_date':instance.end_date,
+                        "chargeable_days":instance.chargeable_days,
+                        'free_days':instance.free_days,
+                        'amount':instance.amount,
+                        'vat_amount':instance.vat_amount,
+                        'total':instance.total,
+                        'currency':instance.currency,
+                        "site_name":site_name,
+                        "url":url})
         
         email_from = settings.Common.DEFAULT_FROM_EMAIL
         recipient_list = [instance.email]
         
         try:
-            send_mail( subject, message, email_from, recipient_list)
+            send_mail( subject, message, email_from, recipient_list,html_message=msg_html)
             
         except Exception as e:
             return
