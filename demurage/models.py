@@ -70,6 +70,7 @@ class Demurage(models.Model):
     
     
 class DemurrageCalculations(models.Model):
+    shipping_company = models.ForeignKey("main.ShippingCompany", null=True, on_delete=models.CASCADE)
     email = models.EmailField()
     container_type= models.CharField(max_length=255)
     start_date = models.DateField()

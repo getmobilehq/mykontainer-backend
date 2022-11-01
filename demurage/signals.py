@@ -42,7 +42,8 @@ MyKontainer Team
                         'total':instance.total,
                         'currency':instance.currency,
                         "site_name":site_name,
-                        "url":url})
+                        "url":url,
+                        "shipping_line":instance.shipping_company.name})
         
         email_from = settings.Common.DEFAULT_FROM_EMAIL
         recipient_list = [instance.email]

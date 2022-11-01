@@ -157,7 +157,7 @@ def calculate_demurage(request):
                                     "currency": "NGN"
                         }
                     }
-                DemurrageCalculations.objects.create(**data, email=email)
+                DemurrageCalculations.objects.create(**data, email=email, shipping_company=company)
                 return Response(data, status=status.HTTP_201_CREATED)
 
             else: 
@@ -200,7 +200,7 @@ def calculate_demurage(request):
                                 "currency": "NGN"
                                 }}
                     values = data['data']
-                    DemurrageCalculations.objects.create(**values, email=email)
+                    DemurrageCalculations.objects.create(**values, email=email, shipping_company=company)
                     return Response(data, status=status.HTTP_201_CREATED)
                 except  Demurage.DoesNotExist:
                     errors = {"message":"failed",
