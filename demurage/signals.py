@@ -31,7 +31,7 @@ Currency: {instance.currency}
 Cheers,
 MyKontainer Team   
 """   
-        msg_html = render_to_string('demurage/templates/calculator_invoice.html', {
+        msg_html = render_to_string('calculator_invoice.html', {
                         'container_type': instance.container_type,
                         'start_date':instance.start_date,
                         'end_date':instance.end_date,
