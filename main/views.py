@@ -111,12 +111,14 @@ def shipping_company_detail(request, company_id):
 def bay_area(request):
     
     if request.method=="GET":
+        objs = BayArea.objects.filter(is_active=True)
+        
         if request.user.is_authenticated:
         
             if request.user.role == "shipping_admin":
                 objs = BayArea.objects.filter(is_active=True, shipping_company=request.user.shipping_company)
-        else:
-            objs = BayArea.objects.filter(is_active=True)
+        
+            
             
         serializer = BayAreaSerializer(objs, many=True)
         
