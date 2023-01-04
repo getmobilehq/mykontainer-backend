@@ -296,7 +296,7 @@ class Production(Staging):
     The in-production settings.
     """
     DEBUG = False
-    ALLOWED_HOSTS = ["159.89.98.134", "bck.mykontainer.app"]
+    ALLOWED_HOSTS = ["207.154.212.88", "bck.mykontainer.app"]
     
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = "smtp.mailgun.org"
