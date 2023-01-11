@@ -204,7 +204,7 @@ class Common(Configuration):
         api_secret = os.getenv('CLOUD_API_SECRET')
     )
 
-    AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.AllowAllUsersModelBackend']
+    
 
     # LOGGING = {
     # 'version': 1,
