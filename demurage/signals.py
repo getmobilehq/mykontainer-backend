@@ -5,6 +5,9 @@ from config import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from .models import DemurrageCalculations
+from mailchimp_marketing import Client
+from mailchimp_marketing.api_client import ApiClientError
+import os
 
 site_name = "MyKontainer"
 url="mykontainer.app"
@@ -55,5 +58,36 @@ MyKontainer Team
             return
         
      
-        # print(instance.password)
-        return
+        
+        #### Add email to mailchimp
+
+        mailchimp = Client()
+        mailchimp.set_config({
+        "api_key": os.getenv("MAILCHIMP_KEY"),
+        "server": "us8"
+        })
+
+        list_id = os.getenv("LIST_ID")
+
+        member_info = {
+            "email_address": instance.email,
+            "status_if_new": "subscribed",
+        }
+
+        try:
+            
+            response = mailchimp.lists.set_list_member(list_id, member_info.get("email_address").lower(), member_info)
+
+            
+        except ApiClientError as error:
+            error_data = eval(error.text)
+            
+            send_mail(subject="Error Adding Email to MailChimp",
+                      message =f"""Hello, Administrator.
+The API was unable to add {instance.email} to the mailchimp account. It failed with the following error:
+{error_data}
+                      
+Cheers,
+MyKontainer Support""", 
+            email_from = "MyKontainer Support <noreply@mykontainer.app>", 
+            recipient_list=["mykontainertech@gmail.com"])
