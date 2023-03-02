@@ -29,7 +29,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name     = models.CharField(_('last name'),max_length = 250)
     role          = models.CharField(_('role'), max_length = 250, choices=ROLE_CHOICES)
     email         = models.EmailField(_('email'), unique=True)
-    phone         = models.CharField(_('phone'), max_length = 20, unique = True, validators=[phone_regex])
+    phone         = models.CharField(_('phone'), max_length = 200, unique = True, validators=[phone_regex])
     user_type = models.CharField(_("user type"), max_length=300, null=True, blank=True)
     company_name = models.CharField(_("company name"), max_length=300, null=True, blank=True)
     address       = models.CharField(_('address'), max_length = 250, null = True)
@@ -73,8 +73,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f"{self.email} -- {self.role}"
     
     def delete(self):
-        self.is_active = False
+        self.is_active=False
+        self.email = f"deleted-{timezone.now()}-{self.email}"
+        self.phone = f"{self.phone}-del-{timezone.now()}"
         self.save()
+        
+        
+    def permanent_delete(self):
+        return super().delete()
         
         
         

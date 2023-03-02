@@ -158,7 +158,7 @@ class Common(Configuration):
         'SERIALIZERS':{
             'user_create': 'accounts.serializers.UserCreateSerializer',
             'user': 'accounts.serializers.UserCreateSerializer',
-            'user_delete': 'djoser.serializers.UserDeleteSerializer'
+            'user_delete': 'accounts.serializers.UserDeleteSerializer'
         }        
         
     }

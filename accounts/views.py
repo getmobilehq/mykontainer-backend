@@ -13,10 +13,34 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.signals import user_logged_in
+from djoser.views import UserViewSet
+from django.contrib.auth.hashers import check_password
+
 
 User = get_user_model()
 
-
+class CustomUserViewSet(UserViewSet):
+    
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        password = serializer.validated_data.get("current_password")
+        
+        if check_password(password, instance.password):
+            
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        
+        elif request.user.role == "admin" and check_password(password, request.user.password):
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+    
+        else:
+            raise AuthenticationFailed(detail={"message":"incorrect password"})
+        
+        
 @swagger_auto_schema(methods=['POST'], request_body=CustomUserSerializer())
 @api_view(['POST', 'GET'])
 @authentication_classes([JWTAuthentication])

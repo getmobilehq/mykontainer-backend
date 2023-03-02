@@ -28,6 +28,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 
+class UserDeleteSerializer(serializers.Serializer):
+    current_password = serializers.CharField(style={"input_type": "password"})
+        
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=300)
