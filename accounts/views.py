@@ -23,8 +23,7 @@ User = get_user_model()
 
 class CustomUserViewSet(UserViewSet):
     
-    @swagger_auto_schema(method="delete", request_body= UserDeleteSerializer())
-    @action(methods=["delete"], detail=True)
+    
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(data=request.data)
