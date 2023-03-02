@@ -1,4 +1,4 @@
-from .serializers import LoginSerializer, CustomUserSerializer, NewOtpSerializer, OTPVerifySerializer
+from .serializers import LoginSerializer, CustomUserSerializer, NewOtpSerializer, OTPVerifySerializer, UserDeleteSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -16,12 +16,15 @@ from django.contrib.auth.signals import user_logged_in
 from djoser.views import UserViewSet
 from django.contrib.auth.hashers import check_password
 
+from rest_framework.decorators import action
+
 
 User = get_user_model()
 
 class CustomUserViewSet(UserViewSet):
     
-    
+    @swagger_auto_schema(method="delete", request_body= UserDeleteSerializer())
+    @action(methods=["delete"], detail=True)
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(data=request.data)
