@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 from accounts.permissions import IsAdminOrShippingAdmin, IsAdminorReadOnly, IsBayAdmin, IsShippingAdminOrBayAdmin
 from main.models import ShippingCompany
 from .models import Demurage, DemurageSize, DemurrageCalculations
-from .serializers import CalculatorSerializer, DemurageSerializer, SizeSerializer
+from .serializers import CalculatorSerializer, DemurageCalculationSerializer, DemurageSerializer, SizeSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.response import Response
@@ -12,6 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from .demurage_helper import amount_per_day
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 # from django.core.mail import send_mail
 # Create your views here.
@@ -322,3 +323,16 @@ def demurage_size_detail(request, size_id):
     
     
     
+class DemurageCalculationListView(ListAPIView):
+    serializer_class = DemurageCalculationSerializer
+    queryset = DemurrageCalculations.objects.filter(is_active=True).order_by('-date_created')
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+    
+
+class DemurageCalculationDetailView(RetrieveAPIView):
+    serializer_class = DemurageCalculationSerializer
+    queryset = DemurrageCalculations.objects.filter(is_active=True).order_by("-date_created")
+    lookup_field = "id"
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]

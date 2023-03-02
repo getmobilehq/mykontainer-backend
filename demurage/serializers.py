@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from main.models import ShippingCompany
-from .models import Demurage, DemurageSize
+from .models import Demurage, DemurageSize, DemurrageCalculations
 from rest_framework.exceptions import ValidationError
 
 
@@ -65,7 +65,18 @@ class CalculatorSerializer(serializers.Serializer):
         return data.lower()
     
     
+class DemurageCalculationSerializer(serializers.ModelSerializer):
+    shipping_company_name = serializers.SerializerMethodField()
     
+    class Meta:
+        model = DemurrageCalculations
+        fields = '__all__'
+        
+        
+        
+    def get_shipping_company_name(self, obj):
+        return obj.shipping_company.name
+          
 # class SendEmailSerializer(serializers.Serializer):
 #     container_type = serializers.CharField(max_length=250)
 #     start_date =  serializers.CharField(max_length=250)  
