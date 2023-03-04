@@ -75,7 +75,11 @@ class DemurageCalculationSerializer(serializers.ModelSerializer):
         
         
     def get_shipping_company_name(self, obj):
-        return obj.shipping_company.name
+        company = obj.shipping_company
+        if company:
+            return company.name
+        
+        return  ""
           
 # class SendEmailSerializer(serializers.Serializer):
 #     container_type = serializers.CharField(max_length=250)
